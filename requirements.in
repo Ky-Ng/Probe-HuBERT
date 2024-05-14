@@ -9,3 +9,6 @@ librosa
 
 # Post Processing
 matplotlib
+
+# Jupyter Notebook
+ipykernel
