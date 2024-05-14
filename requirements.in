@@ -1,0 +1,11 @@
+# Run: pip-compile requirements.in && pip install -r requirements.txt
+
+# Machine Learning
+torch
+transformers
+
+# Audio processing
+librosa
+
+# Post Processing
+matplotlib
