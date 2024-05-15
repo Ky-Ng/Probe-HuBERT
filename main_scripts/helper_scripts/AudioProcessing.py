@@ -117,15 +117,29 @@ class AudioProcessing:
 
     def get_hidden_states(
             input_embedding: torch.tensor,
-            inference_model: HubertForCTC
+            inference_model: HubertForCTC,
+            start_idx: int = None,
+            end_idx: int = None
     ) -> np.ndarray:
         """
         Returns the hidden state for each encoder (1 to 25 for most cases)
-        and each variable length number of 1024 speech vectors
+        and each variable length number of 1024 speech vectors.
+
+        Optionally slices out only the indexes for the specific phoneme specified by
+        [start_idx, end_idx)
+        Note: Both `start_idx` and `end_idx` must be specified or else all sequences of speech vecotrs will be returned
         """
+
+        # Step 1) Get all hidden states for encoders as a list of 2D np.ndarray (seq_len, hidden_size)
         hidden_states_list = [AudioProcessing.tensor_to_np(
             encoder_state) for encoder_state in inference_model(input_embedding).hidden_states]
+        
+        # Step 2) Convert from a list of 2D np.ndarrys to a 3D np.ndarray
         hidden_states_combined = np.stack(hidden_states_list, axis=0)
+
+        # Step 3) Slice out the start 
+        if(start_idx is not None and end_idx is not None):
+            hidden_states_combined = hidden_states_combined[:, start_idx:end_idx, :]
         print(hidden_states_combined.shape)
         return hidden_states_combined
 

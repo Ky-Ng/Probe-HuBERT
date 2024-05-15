@@ -22,5 +22,7 @@ class Constants:
         
         INFERENCE_MODEL = model = HubertForCTC.from_pretrained(
             "facebook/hubert-large-ls960-ft", output_attentions=True, output_hidden_states=True)
-        
+    
+    class PATHING:
+        hidden_state_save_path = "../data/numpy"
         
