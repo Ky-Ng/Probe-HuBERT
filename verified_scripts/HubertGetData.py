@@ -45,7 +45,7 @@ for n in range(len(lst)):
         print(BG[i], ED[i], phn[i])
     print(f"Speech seg length: {len(speech)}")
     for E in range(25):
-        HS = model(input_values).x[E][0, :, :].detach().numpy()
+        HS =  model(input_values).hidden_states[E][0,:,:].detach().numpy()
         for p in range(len(phn)):
             if phn[p] in set(Segs):
                 hs[Segs.index(phn[p])][E] = np.append(

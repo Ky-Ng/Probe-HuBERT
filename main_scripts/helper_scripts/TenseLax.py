@@ -35,6 +35,9 @@ class TenseLax:
     def getSet() -> set:
         return TenseLax._phoneme_set
 
+    def getNumSegs() -> int:
+        return len(TenseLax._flattened_pairs)
+
 # print("Testing Tense Lax")
 # print(TenseLax.getIPA("ey"))
 # print(type(TenseLax.getPairs()))

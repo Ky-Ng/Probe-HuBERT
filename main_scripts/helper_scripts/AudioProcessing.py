@@ -13,7 +13,7 @@ class AudioProcessing:
             embedding_model: Wav2Vec2Processor,
             inference_model: HubertForCTC,
             sampling_rate: int = 16000
-    ) -> tuple[torch.tensor, int]:
+    ) -> tuple[torch.tensor, int, int]:
         """
         Takes a path to a wav file and returns the speech embedding and the size of
         the sequence_length (number of 1024 vectors used to represent the speech length)
@@ -86,10 +86,10 @@ class AudioProcessing:
 
         # Step 2) Calculate speech vector index from speech frame boundaries (use dimensional analysis)
         vecs_per_speech_frame = float(num_speech_vec) / num_speech_frames
-        
+
         # Step 3) Read in the boundaries and scale speech frames to vector index
         speech_frame_df = pd.read_csv(phon_path, sep=' ', header=None)
-        
+
         # 3a) Scale the start/end boundaries
         scaled_vec_boundaries_df = (
             speech_frame_df.iloc[:, :2] * vecs_per_speech_frame).round().astype(int)
@@ -101,14 +101,42 @@ class AudioProcessing:
         combined_df = pd.concat(
             [scaled_vec_boundaries_df, phon_code_df], axis=1
         )
-        
+
         return combined_df
 
-    def filter_segmentation(combined_df: pd.DataFrame, desired_phonemes:set) -> pd.DataFrame:
+    def filter_segmentation(
+        combined_df: pd.DataFrame,
+            desired_phonemes: set
+    ) -> pd.DataFrame:
+        """
+        Returns only the DataFrame rows whose 3rd column (`phon` transcription) is in `desired_phonemes`
+        """
         phoneme_mask = combined_df.iloc[:, 2].isin(desired_phonemes)
         filtered_seg = combined_df[phoneme_mask]
-        print(filtered_seg)
         return filtered_seg
+
+    def get_hidden_states(
+            input_embedding: torch.tensor,
+            inference_model: HubertForCTC
+    ) -> np.ndarray:
+        """
+        Returns the hidden state for each encoder (1 to 25 for most cases)
+        and each variable length number of 1024 speech vectors
+        """
+        hidden_states_list = [AudioProcessing.tensor_to_np(
+            encoder_state) for encoder_state in inference_model(input_embedding).hidden_states]
+        hidden_states_combined = np.stack(hidden_states_list, axis=0)
+        print(hidden_states_combined.shape)
+        return hidden_states_combined
+
+    def tensor_to_np(tensor_to_convert: torch.tensor) -> np.ndarray:
+        # Step 1) Convert Pytorch Tensor to Numpy
+        np_version = tensor_to_convert.detach().numpy()
+
+        # Step 2) Remove the first dimension of the  (1, seq_len, hidden_size)
+        remove_single_dim = np.squeeze(np_version, axis=0)
+
+        return remove_single_dim
 
 # Test Driver:
 # embedded_audio, seq_length = AudioProcessing.process_audio(
