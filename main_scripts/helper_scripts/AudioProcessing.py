@@ -1,6 +1,7 @@
 import torch
 import os
 import numpy as np
+import pandas as pd
 from transformers import HubertForCTC, Wav2Vec2Processor
 import librosa
 
@@ -46,8 +47,9 @@ class AudioProcessing:
         # a single hidden_state's shape is [1, seq_len, hidden_size]
         # Note: in our use case, seq_len=based on length of speech input, hidden_size=1024 for our model
         sequence_length = arbitrary_hidden_state.shape[1]
+        num_speech_frames = len(speech)
 
-        return embedded_audio, sequence_length
+        return embedded_audio, num_speech_frames, sequence_length
 
     def select_samples(input_arr: np.array, num_samples: int) -> np.array:
         sampled_audio = [input_arr[random_sample]  # take text array
@@ -83,11 +85,26 @@ class AudioProcessing:
         phon_path = f"{path_without_extension}.PHN"
 
         # Step 2) Calculate speech vector index from speech frame boundaries (use dimensional analysis)
-        vecs_per_speech_frame = float(num_speech_vec)/num_speech_frames
-
+        vecs_per_speech_frame = float(num_speech_vec) / num_speech_frames
+        print(f"num_speech_vec: {num_speech_vec}, num_speech_frames: {num_speech_frames}, vecs_per_speech_frame: {vecs_per_speech_frame}")
         # Step 3) Read in the boundaries and scale speech frames to vector index
+        print(TIMIT_wav_path)
+        print(phon_path)
+        speech_frame_df = pd.read_csv(phon_path, sep=' ', header=None)
+        print(speech_frame_df[:5])
+        # 3a) Scale the start/end boundaries
+        scaled_vec_boundaries_df = (
+            speech_frame_df.iloc[:, :2] * vecs_per_speech_frame).round().astype(int)
 
-        return None
+        # 3b) Keep the segmented gloss
+        phon_code_df = speech_frame_df.iloc[:, 2]
+
+        # 3c) recombine the files
+        combined_df = pd.concat(
+            [scaled_vec_boundaries_df, phon_code_df], axis=1
+        )
+        print(combined_df[:5])
+        return combined_df.to_numpy()
 
 
 # Test Driver:
@@ -102,6 +119,3 @@ class AudioProcessing:
 # print(embedded_audio.shape)
 
 # print(seq_length)
-
-print(AudioProcessing.get_sequence_boundary(
-    "/Users/kyleng/B_Organized/A_School/Ling_487/clean_code/Probe-HuBERT/TIMIT-Database/TIMIT/TEST/DR1/FAKS0/SA1.wav"))

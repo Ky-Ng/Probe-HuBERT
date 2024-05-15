@@ -1,5 +1,6 @@
 from transformers import HubertForCTC, Wav2Vec2Processor
 
+
 class Constants:
     class LLM:
         # 24 Encoders + 1 input layer as an "encoder"
@@ -15,7 +16,9 @@ class Constants:
 
     class EXPERIMENTATION:
         NUM_SPEECH_SAMPLES = 200
+
         EMBEDDING_MODEL = Wav2Vec2Processor.from_pretrained(
             "facebook/wav2vec2-base-960h")
+        
         INFERENCE_MODEL = model = HubertForCTC.from_pretrained(
             "facebook/hubert-large-ls960-ft", output_attentions=True, output_hidden_states=True)
