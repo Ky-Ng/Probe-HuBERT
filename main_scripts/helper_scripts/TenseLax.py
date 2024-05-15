@@ -15,7 +15,7 @@ class TenseLax:
         "iy": "i",
         "ih": "ɪ",
         "eh": "ɛ",
-        "ey":  "eɪ",
+        "ey": "eɪ",
         "ae": "æ",
         "ow": "oʊ",
         "ao": "ɔ",
@@ -31,7 +31,7 @@ class TenseLax:
 
     def getList() -> list:
         return TenseLax._flattened_pairs
-    
+
     def getSet() -> set:
         return TenseLax._phoneme_set
 
