@@ -13,23 +13,27 @@ def cohensd(x, y):
 
 
 for pair in TenseLax.getPairs():
+    if(pair != ("uw", "uh")):
+        continue
     Segs = list(pair)
-    fig, ax = plt.subplots(layout="constrained", num="")
 
     tn = 20
     CDs_D_E_T = np.zeros((25, 1024, 8, tn))
 
+    # Create the subplot
+    fig, axs = plt.subplots(2, 4)
     for d in range(1, 9):
         DistinctionAll = np.zeros((tn, 25))
         HR = []
         for s in range(len(Segs)):
-            HR.append(np.load('/Users/khaliliskarous/Dropbox/Ling487_24/understandHubert/' +
-                    'HS_' + str(d) + '_' + Segs[s] + '.npy'))
+            HR.append(np.load(
+                f'../data/verified_cd/DR{d}/HS_{d}_{Segs[s]}.npy'))
+            print(HR[s].shape)
         for token in range(tn):
             hr = []
             for s in range(len(Segs)):
                 hr.append(HR[s][:, :, np.random.choice(
-                    HR[s].shape[2], 100, replace=False)])
+                    HR[s].shape[2], min(100, HR[s].shape[2]), replace=False)])
             CD = np.empty((25, 1024))
             for e in range(25):
                 for v in range(1024):
@@ -43,15 +47,34 @@ for pair in TenseLax.getPairs():
         mn = np.mean(DistinctionAll, axis=0)
         sd = np.std(DistinctionAll, axis=0)
 
-        plt.subplot(2, 4, d)
-        plt.plot(np.arange(25), mn, 'r-')
-        plt.fill_between(np.arange(25), mn-sd/2, mn+sd/2, color='r', alpha=.5)
-        if d == 1 | d == 5:
-            plt.ylabel('% Disting. Features')
-        if d > 4:
-            plt.xlabel('Encoders')
-        plt.title(str(d))
+        cur_plot = axs.flatten()[d-1]
+
+        # Plot Data
+        cur_plot.plot(np.arange(25), mn, 'r-')
+        cur_plot.fill_between(np.arange(25), mn-sd/2,
+                              mn+sd/2, color='r', alpha=.5)
+        cur_plot.set_xlim(1, 25)
+
+        x_tick_locations = [0, 15, 25]
+        cur_plot.set_xticks(x_tick_locations)
+        cur_plot.set_xticklabels(x_tick_locations)
+
+        y_tick_locations = [5, 10, 15, 20, 25]
+        cur_plot.set_yticks(y_tick_locations)
+        cur_plot.set_yticklabels(y_tick_locations)
+
+        # Add Labels
+        cur_plot.set_xlabel('Encoders Layer')
+        cur_plot.set_ylabel('% Disting. Features')
+        cur_plot.set_title(f"DR{d}")
+
+        # Progress
         print(d)
 
+    fig.suptitle(f"{TenseLax.getIPA(Segs[0])} vs. {TenseLax.getIPA(Segs[1])}: % Disting. Features by Encoder Layer")
+    plt.tight_layout()
+    plt.show()
 
-    np.save(f'CDs_D_E_T_{Segs[0]}_{Segs[1]}.npy', CDs_D_E_T)
+    save_name = f'CDs_D_E_T_{Segs[0]}_{Segs[1]}'
+    np.save(f'cd_comparisons/{save_name}.npy', CDs_D_E_T)
+    # plt.savefig(f'../assets/percent_differentiation_graphs/{save_name}.png')
