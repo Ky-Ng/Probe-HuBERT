@@ -25,4 +25,7 @@ class Constants:
     
     class PATHING:
         hidden_state_save_path = "../data/numpy"
+    
+    class TIMIT:
+        NUM_DIALECTS = 8
         
