@@ -42,7 +42,7 @@ for d in range(1,9):
     plt.plot(np.arange(25),mn, 'r-')
     plt.fill_between(np.arange(25), mn-sd/2, mn+sd/2,color='r',alpha=.5)
     if d == 1 | d == 5:
-        plt.ylabel('# Disting. Features')
+        plt.ylabel('% Disting. Features')
     if d > 4:
         plt.xlabel('Encoders')
     plt.title(str(d))
