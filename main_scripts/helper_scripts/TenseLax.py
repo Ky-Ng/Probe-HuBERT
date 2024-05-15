@@ -7,6 +7,10 @@ class TenseLax:
         ("uw", "uh"),
     )
 
+    _flattened_pairs = [vowel for vowel_pair in _pairs for vowel in vowel_pair]
+
+    _phoneme_set = set(_flattened_pairs)
+
     _TIMIT_to_IPA_map = {
         "iy": "i",
         "ih": "ɪ",
@@ -24,6 +28,12 @@ class TenseLax:
 
     def getPairs() -> tuple[tuple]:
         return TenseLax._pairs
+
+    def getList() -> list:
+        return TenseLax._flattened_pairs
+    
+    def getSet() -> set:
+        return TenseLax._phoneme_set
 
 # print("Testing Tense Lax")
 # print(TenseLax.getIPA("ey"))

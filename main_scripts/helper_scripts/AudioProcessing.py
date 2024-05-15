@@ -63,7 +63,7 @@ class AudioProcessing:
             TIMIT_wav_path: str,
             num_speech_frames: int,
             num_speech_vec: int
-    ) -> np.ndarray:
+    ) -> pd.DataFrame:
         """
         Takes a `TIMIT` .wav file and finds the corresponding .PHN file
         to translate phoneme `beginning` and `end` boundaries from
@@ -86,12 +86,10 @@ class AudioProcessing:
 
         # Step 2) Calculate speech vector index from speech frame boundaries (use dimensional analysis)
         vecs_per_speech_frame = float(num_speech_vec) / num_speech_frames
-        print(f"num_speech_vec: {num_speech_vec}, num_speech_frames: {num_speech_frames}, vecs_per_speech_frame: {vecs_per_speech_frame}")
+        
         # Step 3) Read in the boundaries and scale speech frames to vector index
-        print(TIMIT_wav_path)
-        print(phon_path)
         speech_frame_df = pd.read_csv(phon_path, sep=' ', header=None)
-        print(speech_frame_df[:5])
+        
         # 3a) Scale the start/end boundaries
         scaled_vec_boundaries_df = (
             speech_frame_df.iloc[:, :2] * vecs_per_speech_frame).round().astype(int)
@@ -103,9 +101,14 @@ class AudioProcessing:
         combined_df = pd.concat(
             [scaled_vec_boundaries_df, phon_code_df], axis=1
         )
-        print(combined_df[:5])
-        return combined_df.to_numpy()
+        
+        return combined_df
 
+    def filter_segmentation(combined_df: pd.DataFrame, desired_phonemes:set) -> pd.DataFrame:
+        phoneme_mask = combined_df.iloc[:, 2].isin(desired_phonemes)
+        filtered_seg = combined_df[phoneme_mask]
+        print(filtered_seg)
+        return filtered_seg
 
 # Test Driver:
 # embedded_audio, seq_length = AudioProcessing.process_audio(
