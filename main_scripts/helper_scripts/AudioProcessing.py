@@ -140,7 +140,6 @@ class AudioProcessing:
         # Step 3) Slice out the start 
         if(start_idx is not None and end_idx is not None):
             hidden_states_combined = hidden_states_combined[:, start_idx:end_idx, :]
-        print(hidden_states_combined.shape)
         return hidden_states_combined
 
     def tensor_to_np(tensor_to_convert: torch.tensor) -> np.ndarray:
