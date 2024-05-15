@@ -97,6 +97,7 @@ numpy==1.26.4
     #   librosa
     #   matplotlib
     #   numba
+    #   pandas
     #   scikit-learn
     #   scipy
     #   soxr
@@ -109,6 +110,8 @@ packaging==24.0
     #   matplotlib
     #   pooch
     #   transformers
+pandas==2.2.2
+    # via -r requirements.in
 parso==0.8.4
     # via jedi
 pexpect==4.9.0
@@ -139,6 +142,9 @@ python-dateutil==2.9.0.post0
     # via
     #   jupyter-client
     #   matplotlib
+    #   pandas
+pytz==2024.1
+    # via pandas
 pyyaml==6.0.1
     # via
     #   huggingface-hub
@@ -204,6 +210,8 @@ typing-extensions==4.11.0
     #   ipython
     #   librosa
     #   torch
+tzdata==2024.1
+    # via pandas
 urllib3==2.2.1
     # via requests
 wcwidth==0.2.13

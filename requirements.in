@@ -3,6 +3,7 @@
 # Machine Learning
 torch
 transformers
+pandas
 
 # Audio processing
 librosa
